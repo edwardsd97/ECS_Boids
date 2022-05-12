@@ -16,6 +16,8 @@ public class BoidSystem : MonoBehaviour
     public Bounds m_Bounds;
     public int m_Count;
 
+    static public Bounds s_Bounds;
+
     ////////////////////
     // ECS /////////////
     private EntityManager m_ECSMgr;
@@ -28,6 +30,9 @@ public class BoidSystem : MonoBehaviour
         var settings = GameObjectConversionSettings.FromWorld(World.DefaultGameObjectInjectionWorld, null);
 
         m_ECSPrefab = GameObjectConversionUtility.ConvertGameObjectHierarchy(m_BoidPrefab, settings);
+
+        s_Bounds = m_Bounds;
+        s_Bounds.center = transform.position;
 
         Spawn();
     }

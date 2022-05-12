@@ -57,7 +57,7 @@ public partial class SBoidSystem : SystemBase
                 {
                     float3 delta = myPos.Value - translations[j].Value;
                     float distSq = math.lengthsq(delta);
-                    if ( data.m_Count < data.m_CountMax && distSq > 0 && distSq < radiusSq )
+                    if ( distSq > 0 && distSq < radiusSq )
                     {
                         data.m_Count++;
 
@@ -70,7 +70,9 @@ public partial class SBoidSystem : SystemBase
 
         }).ScheduleParallel();
 
-  //      boidChunksUpdate.Complete();
+        //      boidChunksUpdate.Complete();
+
+        Bounds bounds = BoidSystem.s_Bounds;
 
         // Average the results when all that is done and combine
         JobHandle finalize = 
@@ -78,25 +80,36 @@ public partial class SBoidSystem : SystemBase
         //            WithDeallocateOnJobCompletion(chunks).
         ForEach((ref CBoidData data, ref Rotation rot, in Translation pos) =>
         {
-            if (data.m_Count > 0)
-		    {
-                data.m_Alignment /= data.m_Count;
-                data.m_Cohesion /= data.m_Count;
-                data.m_Separation /= data.m_Count;
+            float3 direction;
 
-                float3 direction = (data.m_Alignment + data.m_Cohesion + data.m_Separation) - pos.Value;
-
-                //            if (transform.position.x > m_BoidSys.m_ArenaSize.x || transform.position.x < -m_BoidSys.m_ArenaSize.x ||
-                //                transform.position.y > m_BoidSys.m_ArenaSize.y || transform.position.y < -m_BoidSys.m_ArenaSize.y ||
-                //                transform.position.z > m_BoidSys.m_ArenaSize.z || transform.position.z < -m_BoidSys.m_ArenaSize.z)
-                //            {
-                //                // out of bounds - face toward center of boid system
-                //                direction = m_BoidSys.transform.position - transform.position;
-                //            }
-
-                if (math.lengthsq(direction) > 0)
-                    rot.Value = quaternion.LookRotation(direction, math.up());//  quaternion. Slerp(transform.rotation, quaternion.LookRotation(direction), 5.0f * dT);
+            if (pos.Value.x > bounds.max.x || pos.Value.x < bounds.min.x ||
+                pos.Value.y > bounds.max.y || pos.Value.y < bounds.min.y ||
+                pos.Value.z > bounds.max.z || pos.Value.z < bounds.min.z)
+            {
+                // out of bounds - face toward center of boid system
+                direction.x = bounds.center.x - pos.Value.x;
+                direction.y = bounds.center.y - pos.Value.y;
+                direction.z = bounds.center.z - pos.Value.z;
             }
+            else if (data.m_Count > 0)
+            {
+                data.m_Alignment /= data.m_Count;
+
+                data.m_Cohesion /= data.m_Count;
+                //                data.m_Cohesion = math.normalize( data.m_Cohesion - pos.Value );
+
+                data.m_Separation /= data.m_Count;
+                //                data.m_Separation = math.normalize(data.m_Separation);
+
+                direction = (data.m_Alignment + data.m_Cohesion + data.m_Separation * 1.5f) - pos.Value;
+            }
+            else
+            {
+                direction = math.forward(rot.Value);
+            }
+
+            if (math.lengthsq(direction) > 0)
+                rot.Value =  math.slerp(rot.Value, quaternion.LookRotation(direction, math.up()), dT);
 
         }).ScheduleParallel(this.Dependency);
 
