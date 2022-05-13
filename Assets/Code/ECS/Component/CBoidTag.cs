@@ -10,5 +10,6 @@ using Unity.Mathematics;
 public struct CBoidTag : IComponentData
 {
 	public int m_Group;
+	public int m_ID;
 	public Bounds m_Bounds;
 }

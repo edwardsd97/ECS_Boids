@@ -60,9 +60,12 @@ public partial class SBoidSystem : SystemBase
                     if (tags[j].m_Group != tag.m_Group)
                         continue;
 
+                    if (tags[j].m_ID == tag.m_ID)
+                        continue;
+
                     float3 delta = myPos.Value - translations[j].Value;
                     float distSq = math.lengthsq(delta);
-                    if ( distSq > 0 && distSq < radiusSq )
+                    if ( distSq < radiusSq )
                     {
                         data.m_Count++;
 

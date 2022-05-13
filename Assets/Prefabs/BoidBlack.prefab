@@ -82,6 +82,7 @@ MonoBehaviour:
     x: 0
     y: 0
     z: 0
+  m_WasEverFree: 0
 --- !u!114 &2446247388436358454
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -124,6 +125,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Group: 0
+  m_ID: 0
   m_Bounds:
     m_Center: {x: 0, y: 0, z: 0}
     m_Extent: {x: 0, y: 0, z: 0}
@@ -160,7 +162,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5166218036705438510}
-  m_Mesh: {fileID: -5755197145248551033, guid: b195be9e97e40fc48a8e0dc484fd91d1, type: 3}
+  m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!23 &699258363364272620
 MeshRenderer:
   m_ObjectHideFlags: 0

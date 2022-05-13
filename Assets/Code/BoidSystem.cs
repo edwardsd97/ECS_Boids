@@ -13,19 +13,17 @@ using Random = UnityEngine.Random;
 
 public class BoidSystem : MonoBehaviour
 {
-    public GameObject m_BoidPrefab;
+    public List<GameObject> m_BoidPrefabs = new List<GameObject>();
     public Bounds m_Bounds;
     public int m_Count;
     public bool m_Collision = true;
 
-    static int m_GroupNext;
-
-    private int m_Group;
-
     ////////////////////
     // ECS /////////////
     private EntityManager m_ECSMgr;
-    private Entity m_ECSPrefab;
+    private List<Entity> m_ECSPrefabs = new List<Entity>();
+
+    private static int s_BoidIdNext = 1;
 
     private void Start()
     {
@@ -33,34 +31,63 @@ public class BoidSystem : MonoBehaviour
 
         var settings = GameObjectConversionSettings.FromWorld(World.DefaultGameObjectInjectionWorld, null);
 
-        m_ECSPrefab = GameObjectConversionUtility.ConvertGameObjectHierarchy(m_BoidPrefab, settings);
-
-        m_Group = m_GroupNext++;
+        foreach( GameObject prefab in m_BoidPrefabs )
+		{
+            m_ECSPrefabs.Add( GameObjectConversionUtility.ConvertGameObjectHierarchy(prefab, settings) );
+        }
 
         m_Bounds.center = transform.position;
 
         Spawn();
     }
 
+    private bool TouchesAnother( float3[] list, int listCount, float3 test )
+	{
+        float radiusSq = 0.5f * 0.5f;
+        for ( int i = 0; i < listCount; i++)
+        {
+            if (math.distancesq( list[i], test ) <= radiusSq)
+                return true;
+        }
+        return false;                
+	}
+
 	private void Spawn()
     {
         NativeArray<Entity> enemyArray = new NativeArray<Entity>(m_Count, Allocator.Temp);
 
+        float3[] spawnPositions = new float3[enemyArray.Length];
+
+        // Get set of spawn positions that are not touching eachother
+        for ( int i = 0; i < enemyArray.Length; i++ )
+		{
+            float3 pos = new float3();
+
+            do
+            {
+                pos.x = math.lerp(m_Bounds.min.x, m_Bounds.max.x, Random.value);
+                pos.y = math.lerp(m_Bounds.min.y, m_Bounds.max.y, Random.value);
+                pos.z = math.lerp(m_Bounds.min.z, m_Bounds.max.z, Random.value);
+
+            } while (TouchesAnother(spawnPositions, i - 1, pos ) );
+
+            spawnPositions[i] = pos;
+        }
+
         for (int i = 0; i < enemyArray.Length; i++)
         {
-            enemyArray[i] = m_ECSMgr.Instantiate(m_ECSPrefab);
+            int groupId = Random.Range(0, m_ECSPrefabs.Count);
+            Entity entityPrefab = m_ECSPrefabs[groupId];
 
-            float3 pos = new float3();
-            pos.x = math.lerp(m_Bounds.min.x, m_Bounds.max.x, Random.value);
-            pos.y = math.lerp(m_Bounds.min.y, m_Bounds.max.y, Random.value);
-            pos.z = math.lerp(m_Bounds.min.z, m_Bounds.max.z, Random.value);
+            enemyArray[i] = m_ECSMgr.Instantiate(entityPrefab);
 
-            m_ECSMgr.SetComponentData(enemyArray[i], new Translation { Value = pos });
+            m_ECSMgr.SetComponentData(enemyArray[i], new Translation { Value = spawnPositions[i] });
             m_ECSMgr.SetComponentData(enemyArray[i], new Rotation { Value = quaternion.EulerXYZ( Random.value * 360, Random.value * 360, Random.value * 360) });
 
             CBoidTag data = m_ECSMgr.GetComponentData<CBoidTag>(enemyArray[i]);
-            data.m_Group = m_Group;
+            data.m_Group = groupId;
             data.m_Bounds = m_Bounds;
+            data.m_ID = s_BoidIdNext++;
             m_ECSMgr.SetComponentData(enemyArray[i], data );
 
             CCollision col = m_ECSMgr.GetComponentData<CCollision>(enemyArray[i]);
