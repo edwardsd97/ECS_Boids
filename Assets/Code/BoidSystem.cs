@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 // ECS /////////////
@@ -15,8 +16,11 @@ public class BoidSystem : MonoBehaviour
     public GameObject m_BoidPrefab;
     public Bounds m_Bounds;
     public int m_Count;
+    public bool m_Collision = true;
 
-    static public Bounds s_Bounds;
+    static int m_GroupNext;
+
+    private int m_Group;
 
     ////////////////////
     // ECS /////////////
@@ -31,13 +35,14 @@ public class BoidSystem : MonoBehaviour
 
         m_ECSPrefab = GameObjectConversionUtility.ConvertGameObjectHierarchy(m_BoidPrefab, settings);
 
-        s_Bounds = m_Bounds;
-        s_Bounds.center = transform.position;
+        m_Group = m_GroupNext++;
+
+        m_Bounds.center = transform.position;
 
         Spawn();
     }
 
-    private void Spawn()
+	private void Spawn()
     {
         NativeArray<Entity> enemyArray = new NativeArray<Entity>(m_Count, Allocator.Temp);
 
@@ -52,6 +57,15 @@ public class BoidSystem : MonoBehaviour
 
             m_ECSMgr.SetComponentData(enemyArray[i], new Translation { Value = pos });
             m_ECSMgr.SetComponentData(enemyArray[i], new Rotation { Value = quaternion.EulerXYZ( Random.value * 360, Random.value * 360, Random.value * 360) });
+
+            CBoidTag data = m_ECSMgr.GetComponentData<CBoidTag>(enemyArray[i]);
+            data.m_Group = m_Group;
+            data.m_Bounds = m_Bounds;
+            m_ECSMgr.SetComponentData(enemyArray[i], data );
+
+            CCollision col = m_ECSMgr.GetComponentData<CCollision>(enemyArray[i]);
+            col.m_Enabled = m_Collision;
+            m_ECSMgr.SetComponentData(enemyArray[i], col);
         }
 
         enemyArray.Dispose();

@@ -9,4 +9,6 @@ using Unity.Mathematics;
 [GenerateAuthoringComponent] // only ONE GenerateAuthoringComponent per file ;(
 public struct CBoidTag : IComponentData
 {
+	public int m_Group;
+	public Bounds m_Bounds;
 }

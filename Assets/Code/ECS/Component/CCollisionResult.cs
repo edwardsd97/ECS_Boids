@@ -7,12 +7,7 @@ using Unity.Transforms;
 using Unity.Mathematics;
 
 [GenerateAuthoringComponent] // only ONE GenerateAuthoringComponent per file ;(
-public struct CBoidData : IComponentData
+public struct CCollisionResult : IComponentData
 {
-    public float m_Count;
-    public float m_Radius;
-
-    public float3 m_Alignment;
-    public float3 m_Cohesion;
-    public float3 m_Separation;
+    public float3 m_Position;
 }

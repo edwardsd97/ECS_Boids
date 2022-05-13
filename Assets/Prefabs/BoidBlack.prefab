@@ -10,6 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 3884623598980048864}
   - component: {fileID: 1319701448451899993}
+  - component: {fileID: 7992312415841814500}
+  - component: {fileID: 261711136608707439}
   - component: {fileID: 2446247388436358454}
   - component: {fileID: 2585003781588613188}
   - component: {fileID: -474101925466905819}
@@ -17,7 +19,7 @@ GameObject:
   - component: {fileID: 7488520535648737374}
   - component: {fileID: 699258363364272620}
   m_Layer: 0
-  m_Name: Boid
+  m_Name: BoidBlack
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -50,6 +52,35 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ConversionMode: 0
+--- !u!114 &7992312415841814500
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5166218036705438510}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a08dc8e919ebef4438fb6064b5024bbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Radius: 0.5
+--- !u!114 &261711136608707439
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5166218036705438510}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db9f87a2de154f843934b2d84f099713, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Position:
+    x: 0
+    y: 0
+    z: 0
 --- !u!114 &2446247388436358454
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -104,7 +135,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Count: 0
-  m_CountMax: 1000
   m_Radius: 3
   m_Alignment:
     x: 0
