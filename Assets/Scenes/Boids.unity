@@ -17,7 +17,7 @@ RenderSettings:
   m_Fog: 1
   m_FogColor: {r: 0.65080994, g: 0.666729, b: 0.7075472, a: 1}
   m_FogMode: 3
-  m_FogDensity: 0.05
+  m_FogDensity: 0.01
   m_LinearFogStart: 0
   m_LinearFogEnd: 300
   m_AmbientSkyColor: {r: 0.212, g: 0.227, b: 0.259, a: 1}
@@ -506,7 +506,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4527368504392492, guid: fea936d0827df874aa6c644f01aa6f25, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -10
+      value: -15
       objectReference: {fileID: 0}
     - target: {fileID: 4527368504392492, guid: fea936d0827df874aa6c644f01aa6f25, type: 3}
       propertyPath: m_LocalPosition.z
@@ -540,7 +540,8 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 65922563007594602, guid: fea936d0827df874aa6c644f01aa6f25, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: fea936d0827df874aa6c644f01aa6f25, type: 3}
 --- !u!1 &2138677391
 GameObject:
