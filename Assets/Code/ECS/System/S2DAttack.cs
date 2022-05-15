@@ -31,20 +31,20 @@ public partial class S2DAttack : SystemBase
         var typeEntity = mgr.GetEntityTypeHandle();
 
         var chunks = m_Query.CreateArchetypeChunkArray(Allocator.TempJob);
-
-        JobHandle attacks = 
+        
+//        JobHandle attacks = 
         Entities.
         WithReadOnly(typeAtk).
         WithReadOnly(typeEntity).
         WithReadOnly(chunks).
-        ForEach((Entity ent, ref CAttackHits hits, in CTranslation2D trans, in CCollision col) =>
+        ForEach((Entity ent, ref CAttackHits hits, ref CTranslation2D trans, in CCollision col) =>
 		{
-            for (int i = 0; i < chunks.Length && hits.m_Count < 4; i++)
+            for (int i = 0; i < chunks.Length && trans.m_HitCount < 4; i++)
 			{
 				var chunk = chunks[i];
 				var attacks = chunk.GetNativeArray(typeAtk);
                 var attackEnts = chunk.GetNativeArray(typeEntity);
-                for (int j = 0; j < chunk.Count && hits.m_Count < 4; j++)
+                for (int j = 0; j < chunk.Count && trans.m_HitCount < 4; j++)
 				{
                     if ((col.m_LayerMask & attacks[j].m_LayerMask) == 0)
                         continue;
@@ -52,31 +52,28 @@ public partial class S2DAttack : SystemBase
                     float combinedRadius = attacks[j].m_Radius + col.m_Radius;
                     float combinedRadiusSq = combinedRadius * combinedRadius;
 
+                    float2 delta = trans.m_Translation - attacks[j].m_Point;
+
                     switch ( (Attack2D.Type) attacks[j].m_Type )
 					{
                         case Attack2D.Type.Sphere:
                             {
-                                float2 delta = trans.m_Translation - attacks[j].m_Point;
-
                                 if (math.lengthsq(delta) <= combinedRadiusSq)
                                 {
-                                    // Hit
-                                    hits.m_Hits[hits.m_Count++] = attackEnts[j].Index;
+                                    hits.m_Hits[trans.m_HitCount++] = attackEnts[j].Index;
                                 }
                             }
                             break;
 
                         case Attack2D.Type.Line:
                             {
-                                float2 delta = trans.m_Translation - attacks[j].m_Point;
                                 float clampedDot = math.clamp(math.dot(delta, attacks[j].m_LineDir), 0.0f, attacks[j].m_LineLength );
 
                                 float2 closestPointOnLine = attacks[j].m_Point + attacks[j].m_LineDir * clampedDot;
 
                                 if (math.lengthsq(trans.m_Translation - closestPointOnLine) <= combinedRadiusSq)
                                 {
-                                    // Hit
-                                    hits.m_Hits[hits.m_Count++] = attackEnts[j].Index;
+                                    hits.m_Hits[trans.m_HitCount++] = attackEnts[j].Index;
                                 }
                             }
                             break;
@@ -84,10 +81,6 @@ public partial class S2DAttack : SystemBase
                 }
             }
 
-        }).ScheduleParallel(this.Dependency);
-
-        attacks.Complete();
-
-        chunks.Dispose();
+        }).WithDisposeOnCompletion(chunks).ScheduleParallel();
     }
 }

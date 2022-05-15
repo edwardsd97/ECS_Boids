@@ -17,6 +17,7 @@ public class Attack2D : MonoBehaviour
     }
 
     public Type m_Type;
+    public LayerMask m_Layers;
 	public float m_Radius;
 
     public float m_OrbitRadius;
@@ -68,7 +69,7 @@ public class Attack2D : MonoBehaviour
         m_Entity = m_Mgr.CreateEntity(m_Archetype);
 
         CAttack2D atk = m_Mgr.GetComponentData<CAttack2D>(m_Entity);
-        atk.m_LayerMask = -1;
+        atk.m_LayerMask = m_Layers.value;
         atk.m_Point.x = transform.position.x;
         atk.m_Point.y = transform.position.y;
         atk.m_Radius = m_Radius * transform.localScale.y;

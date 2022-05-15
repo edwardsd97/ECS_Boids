@@ -86,7 +86,7 @@ public class Entity2D : MonoBehaviour
         CAvoidance2D avd = m_Mgr.GetComponentData<CAvoidance2D>(m_Entity);
         avd.m_ID = m_EntityID;
         avd.m_LayerMask = 1 << gameObject.layer;
-        avd.m_Radius = m_Radius * 2.0f * scale;
+        avd.m_Radius = m_Radius * 1.5f * scale;
         avd.m_Weight = 1.0f;
         m_Mgr.SetComponentData<CAvoidance2D>(m_Entity, avd);
 
@@ -152,22 +152,23 @@ public class Entity2D : MonoBehaviour
             }
             m_LastTranslation = trans.m_Translation;
 
-            CAttackHits hits = m_Mgr.GetComponentData<CAttackHits>(m_Entity);
-            for (int i = 0; i < hits.m_Count; i++)
-            {
-                // Process hit from an attack matching that entity id
-                Attack2D atk;
-                if (Attack2D.m_Dictionary.TryGetValue(hits.m_Hits[i], out atk))
+            if ( trans.m_HitCount > 0 )
+			{
+                CAttackHits hits = m_Mgr.GetComponentData<CAttackHits>(m_Entity);
+                for (int i = 0; i < trans.m_HitCount; i++)
                 {
-                    // Process damage from the Attack2D gameobject
-                    Die();
-                    return;
+                    // Process hit from an attack matching that entity id
+                    Attack2D atk;
+                    if (Attack2D.m_Dictionary.TryGetValue(hits.m_Hits[i], out atk))
+                    {
+                        // Process damage from the Attack2D gameobject
+                        Die();
+                        return;
+                    }
                 }
-            }
-            if (hits.m_Count > 0)
-            {
-                hits.m_Count = 0;
-                m_Mgr.SetComponentData<CAttackHits>(m_Entity, hits);
+
+                trans.m_HitCount = 0;
+                m_Mgr.SetComponentData<CTranslation2D>(m_Entity, trans );
             }
 
             if (m_AnimSimple != null)
