@@ -207,8 +207,8 @@ MonoBehaviour:
   m_Bounds:
     m_Center: {x: 0, y: 0, z: 0}
     m_Extent: {x: 20, y: 10, z: 20}
-  m_Count: 6000
-  m_Collision: 1
+  m_Count: 10000
+  m_Collision: 0
 --- !u!4 &1450379631
 Transform:
   m_ObjectHideFlags: 0

@@ -6,7 +6,6 @@ using UnityEngine;
 using Unity.Mathematics;
 using Unity.Entities;
 using Unity.Transforms;
-using Unity.Rendering;
 using Unity.Collections;
 
 using Random = UnityEngine.Random;
@@ -63,13 +62,15 @@ public class BoidSystem : MonoBehaviour
 		{
             float3 pos = new float3();
 
+            int failSafe = 0;
             do
             {
                 pos.x = math.lerp(m_Bounds.min.x, m_Bounds.max.x, Random.value);
                 pos.y = math.lerp(m_Bounds.min.y, m_Bounds.max.y, Random.value);
                 pos.z = math.lerp(m_Bounds.min.z, m_Bounds.max.z, Random.value);
+                failSafe++;
 
-            } while (TouchesAnother(spawnPositions, i - 1, pos ) );
+            } while ( failSafe < 20 && TouchesAnother(spawnPositions, i - 1, pos ) );
 
             spawnPositions[i] = pos;
         }
